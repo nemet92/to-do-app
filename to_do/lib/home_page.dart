@@ -10,22 +10,31 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends ProjectLoading<MyHomePage> {
-  List<TodoModel>? items;
+  List<Data>? items;
   late final ProjectService projectService;
   @override
   void initState() {
     projectService = GeneralService();
     sendItemApi();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _refreshIndicator.currentState?.show());
     super.initState();
   }
 
   Future<void> sendItemApi() async {
     changeWaitValue();
     items = await projectService.sendItemApi();
+
     changeWaitValue();
   }
 
+  Future<void> deleteItemFromApi(int userId) async {
+    projectService.removeItem(userId);
+  }
+
   bool checkBox = false;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicator =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,39 +42,56 @@ class _MyHomePageState extends ProjectLoading<MyHomePage> {
         drawer: const Drawer(),
         appBar: AppBar(
           centerTitle: true,
-          title: const Text("To Do"),
         ),
-        body: Center(
-          child: isWait
-              ? const CircularProgressIndicator(
-                  color: Colors.red,
-                )
-              : ListView.builder(
-                  itemCount: items?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        color: Color(items?[index].changeColorValue ?? 0),
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            radius: 16,
+        body: RefreshIndicator(
+          onRefresh: sendItemApi,
+          key: _refreshIndicator,
+          child: Center(
+            child: isWait
+                ? const CircularProgressIndicator(
+                    // color: Colors.red,
+                    )
+                : ListView.builder(
+                    itemCount: items?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          color: Color(items?[index].changeColorValue ?? 0),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage("${items?[index].avatar}"),
+                              radius: 16,
+                            ),
+                            subtitle: Text(
+                              items?[index].email ?? " Error",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            title: Text(
+                              "${items?[index].firstName ?? "Error "} ${items?[index].lastName}",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            trailing: Wrap(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      deleteItemFromApi(items?[index].id ?? 0);
+                                    });
+                                  },
+                                  color: Colors.white,
+                                  icon: const Icon(Icons.delete),
+                                ),
+                                Checkbox(
+                                    value: checkBox, onChanged: ((value) {}))
+                              ],
+                            ),
                           ),
-                          title: Text(items?[index].id.toString() ?? "Error"),
-                          trailing: Wrap(
-                            children: [
-                              const Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              ),
-                              Checkbox(value: checkBox, onChanged: ((value) {}))
-                            ],
-                          ),
-                          subtitle: Text(items?[index].email ?? "e"),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+          ),
         ));
   }
 }

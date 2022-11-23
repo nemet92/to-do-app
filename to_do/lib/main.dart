@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'To Do app',
+        title: 'simple',
         theme: ThemeData(),
         home: const MyHomePage());
   }
