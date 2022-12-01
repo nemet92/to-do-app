@@ -24,23 +24,4 @@ class GeneralService implements ProjectService {
     print(response);
     return null;
   }
-
-// import 'package:commerce/test_model.dart';
-// import 'package:dio/dio.dart';
-
-// abstract class ProjectService {
-//   Future<List<Data>?> getItemFromApi();
-// }
-
-// class GeneralService implements ProjectService {
-//   Dio dio = Dio();
-//   @override
-//   Future<List<Data>?> getItemFromApi() async {
-//     final response = await dio.get("http://localhost:3000/users");
-//     if (response.statusCode == 200) {
-//       final value = TestModel.fromJson(response.data);
-//       return value.data;
-//     }
-//     return null;
-//   }
 }

@@ -14,8 +14,11 @@ class _MyHomePageState extends ProjectLoading<MyHomePage> {
   late final ProjectService projectService;
   @override
   void initState() {
-    projectService = GeneralService();
-    sendItemApi();
+    setState(() {
+      projectService = GeneralService();
+      sendItemApi();
+    });
+
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _refreshIndicator.currentState?.show());
     super.initState();
@@ -24,7 +27,6 @@ class _MyHomePageState extends ProjectLoading<MyHomePage> {
   Future<void> sendItemApi() async {
     changeWaitValue();
     items = await projectService.sendItemApi();
-
     changeWaitValue();
   }
 
@@ -46,52 +48,64 @@ class _MyHomePageState extends ProjectLoading<MyHomePage> {
         body: RefreshIndicator(
           onRefresh: sendItemApi,
           key: _refreshIndicator,
-          child: Center(
-            child: isWait
-                ? const CircularProgressIndicator(
-                    // color: Colors.red,
-                    )
-                : ListView.builder(
-                    itemCount: items?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Card(
-                          color: Color(items?[index].changeColorValue ?? 0),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage("${items?[index].avatar}"),
-                              radius: 16,
-                            ),
-                            subtitle: Text(
-                              items?[index].email ?? " Error",
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            title: Text(
-                              "${items?[index].firstName ?? "Error "} ${items?[index].lastName}",
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            trailing: Wrap(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      deleteItemFromApi(items?[index].id ?? 0);
-                                    });
-                                  },
-                                  color: Colors.white,
-                                  icon: const Icon(Icons.delete),
-                                ),
-                                Checkbox(
-                                    value: checkBox, onChanged: ((value) {}))
-                              ],
-                            ),
+          child: isWait
+              ? Container()
+              : ListView.builder(
+                  itemCount: items?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        color: Color(items?[index].changeColorValue ?? 0),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage("${items?[index].avatar}"),
+                            radius: 16,
+                          ),
+                          subtitle: Text(
+                            items?[index].email ?? " Error",
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          title: Text(
+                            "${items?[index].firstName ?? "Error "} ${items?[index].lastName}",
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          trailing: Wrap(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    deleteItemFromApi(items?[index].id ?? 0);
+                                    _refreshIndicator.currentState?.show();
+                                  });
+                                },
+                                color: Colors.white,
+                                icon: const Icon(Icons.delete),
+                              ),
+                              Checkbox(value: checkBox, onChanged: ((value) {}))
+                            ],
                           ),
                         ),
-                      );
-                    }),
-          ),
+                      ),
+                    );
+                  }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            print("object");
+            const AlertDialog(
+              title: Text("dad"),
+              actions: [
+                TextField(),
+                SizedBox(
+                  height: 150,
+                  width: 15,
+                )
+              ],
+            );
+          },
+          child: const Icon(Icons.add),
         ));
   }
 }
