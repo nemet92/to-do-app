@@ -14,10 +14,8 @@ class _MyHomePageState extends ProjectLoading<MyHomePage> {
   late final ProjectService projectService;
   @override
   void initState() {
-    setState(() {
-      projectService = GeneralService();
-      sendItemApi();
-    });
+    projectService = GeneralService();
+    sendItemApi();
 
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _refreshIndicator.currentState?.show());
